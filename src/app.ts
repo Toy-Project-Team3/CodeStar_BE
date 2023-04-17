@@ -1,7 +1,7 @@
 import express from 'express';
 import { myDataBase } from "../db"
 import cors from 'cors'
-
+import AuthRouter from '../router/auth'
 export const tokenList ={}
 
 myDataBase
@@ -20,6 +20,8 @@ app.use(express.urlencoded())
 app.use(cors({
   origin: true
 }))
+
+app.use('/auth', AuthRouter)
 
 app.listen(3000, () => {
   console.log('Server started on port 3000');
