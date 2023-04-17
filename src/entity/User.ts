@@ -8,7 +8,7 @@ export class User {
     @Column({unique: true})
     userId: string
     @Column({unique: true})
-    userName:string
+    username:string
     @Column()
     password:string
     @CreateDateColumn()
