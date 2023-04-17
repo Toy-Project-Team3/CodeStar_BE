@@ -6,7 +6,7 @@ dotenv.config()
 
 
 export const myDataBase = new DataSource({
-    type: "mssql",
+    type: "mysql",
     host: process.env.TYPEORM_HOST,
     port: parseInt(process.env.TYPEORM_POST),
     username: process.env.TYPEORM_USERNAME,
