@@ -3,14 +3,17 @@ import { myDataBase } from "../../db"
 import { User } from "../entity/User"
 import bcrypt from 'bcrypt'
 import { verify } from 'jsonwebtoken'
+import dotenv from 'dotenv'
 import { generanteRefreshToken, generateAccessToken, generatePassword, registerToken } from "../util/Auth"
+
+dotenv.config()
 
 export class UserController {
     static register =async (req:Request, res:Response) => {
-    const {userId, password, username} = req.body     
+    const {userId, password, userName} = req.body     
     
     const existUser = await myDataBase.getRepository(User).findOne({
-        where: [ {userId}, {username}]
+        where: [{userId}, {userName}]
     })
     if(existUser) {
         return res.status(400).json({error: 'Duplicate User'})
@@ -18,13 +21,16 @@ export class UserController {
     const user = new User()
     user.userId = userId
     user.password = await generatePassword(password)
-    user.username = username
+    user.userName = userName
 
     const newUser = await myDataBase.getRepository(User).save(user)
-    const accessToken = generateAccessToken(newUser.id, newUser.userId, newUser.username )
-    const refreshToken = generanteRefreshToken(newUser.id, newUser.username, newUser.userId)
+    const accessToken = generateAccessToken(newUser.id, newUser.userId, newUser.userName )
+    const refreshToken = generanteRefreshToken(newUser.id, newUser.userName, newUser.userId)
     registerToken(refreshToken, accessToken)
+    
     const decoded = verify(accessToken, process.env.SECRET_ATOKEN)
+   
+    res.cookie('refereshToken', refreshToken, {path: '/', httpOnly: true, maxAge: 3600 * 24 * 30 * 1000})
     res.send({ content: decoded, accessToken, refreshToken})
  }
  static login = async (req: Request, res: Response) => {
@@ -42,8 +48,8 @@ export class UserController {
         return res.status(400).json({error: 'Invalid Password'})
     } 
 
-    const accessToken = generateAccessToken(user.id, user.username, user.userId)
-    const refreshToken = generanteRefreshToken(user.id, user.username, user.userId)
+    const accessToken = generateAccessToken(user.id, user.userName, user.userId)
+    const refreshToken = generanteRefreshToken(user.id, user.userName, user.userId)
 
     const decoded = verify(accessToken, process.env.SECRET_ATOKEN)
 
