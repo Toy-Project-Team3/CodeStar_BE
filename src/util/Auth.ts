@@ -10,7 +10,7 @@ export const generatePassword = async (pw: string) => {
 
 export const generateAccessToken = (id: string, username: string, userId: string) => {
     return jwt.sign(
-        { id, username, userId },
+        { id: id, username: username, userId:userId },
         process.env.SECRET_ATOKEN,
         {expiresIn: '1h'}
     )
