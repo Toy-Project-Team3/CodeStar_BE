@@ -27,4 +27,27 @@ export class UserController {
     const decoded = verify(accessToken, process.env.SECRET_ATOKEN)
     res.send({ content: decoded, accessToken, refreshToken})
  }
+ static login = async (req: Request, res: Response) => {
+    const {userId, password} = req.body
+
+    const user = await myDataBase.getRepository(User).findOne({
+        where: {userId}
+    })
+    if(!user) {
+        return res.status(400).json({error: 'User not find'})
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password)
+    if(!validPassword) {
+        return res.status(400).json({error: 'Invalid Password'})
+    } 
+
+    const accessToken = generateAccessToken(user.id, user.username, user.userId)
+    const refreshToken = generanteRefreshToken(user.id, user.username, user.userId)
+
+    const decoded = verify(accessToken, process.env.SECRET_ATOKEN)
+
+    res.send({content: decoded, accessToken, refreshToken})
+ }
+
 }
