@@ -36,4 +36,19 @@ export class PostController {
     });
     res.send(results);
   };
+  static getPost = async (req: Request, res: Response) => {
+    const results = await myDataBase.getRepository(Post).findOne({
+      where: { postId: req.params.id },
+      select: {
+        author: {
+          id: true,
+          userName: true,
+        },
+      },
+      relations: {
+        author: true,
+      },
+    });
+    res.send(results);
+  };
 }
