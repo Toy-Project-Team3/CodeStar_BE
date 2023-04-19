@@ -2,7 +2,7 @@ import { myDataBase } from '../../db';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
 import { JwtRequest } from '../interface/interfaces';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 export class PostController {
   static createPost = async (req: JwtRequest, res: Response) => {
@@ -22,18 +22,18 @@ export class PostController {
     res.status(201).send(result);
   };
 
-  static getPosts = async (req:Request, res:Response) => {
+  static getPosts = async (req: Request, res: Response) => {
     const results = await myDataBase.getRepository(Post).find({
       select: {
         author: {
           id: true,
-          userName: true
+          userName: true,
         },
       },
       relations: {
-        author: true
+        author: true,
       },
-    })
-    res.send(results)
-  }
+    });
+    res.send(results);
+  };
 }
