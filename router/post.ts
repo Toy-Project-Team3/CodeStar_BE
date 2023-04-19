@@ -6,4 +6,5 @@ const routes = Router();
 
 routes.post('', AuthMiddleware.verifiyToken, PostController.createPost);
 routes.get('', PostController.getPosts)
+routes.get('/:postId', PostController.getPost)
 export default routes;
