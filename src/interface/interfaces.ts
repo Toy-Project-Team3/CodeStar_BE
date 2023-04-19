@@ -1,9 +1,9 @@
 import { Request } from 'express';
 
 export interface TokenPayload {
+  id: string;
   userId: string;
   username: string;
-  id: string;
 }
 
 export interface JwtRequest extends Request {
