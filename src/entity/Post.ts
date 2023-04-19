@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from './User';
 
 @Entity()
@@ -9,9 +9,7 @@ export class Post {
   title: string;
   @Column()
   content: string;
-  @Column()
-  codeContent: string;
-  @ManyToMany((type) => User, (user) => user.postList)
+  @ManyToOne(() => User, (user) => user.postList)
   author: User;
   @CreateDateColumn()
   createdAt: Date;
