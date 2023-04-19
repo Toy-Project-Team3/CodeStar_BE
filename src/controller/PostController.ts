@@ -21,4 +21,19 @@ export class PostController {
     const result = await myDataBase.getRepository(Post).insert(post);
     res.status(201).send(result);
   };
+
+  static getPosts = async (req:Request, res:Response) => {
+    const results = await myDataBase.getRepository(Post).find({
+      select: {
+        author: {
+          id: true,
+          userName: true
+        },
+      },
+      relations: {
+        author: true
+      },
+    })
+    res.send(results)
+  }
 }
