@@ -3,15 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-
 } from 'typeorm';
 import { User } from './User';
-
-
 
 @Entity()
 export class Post extends BaseEntity {
@@ -21,7 +17,7 @@ export class Post extends BaseEntity {
   title: string;
   @Column()
   content: string;
-  @Column("simple-array", { nullable: true })
+  @Column('simple-array', { nullable: true })
   tags: string[];
   @ManyToOne(() => User, (user) => user.postList)
   author: User;
