@@ -40,7 +40,7 @@ export class PostController {
   };
   static getPost = async (req: Request, res: Response) => {
     const results = await myDataBase.getRepository(Post).findOne({
-      where: { postId: req.params.id },
+      where: { postId: req.params.postId },
       select: {
         author: {
           id: true,
@@ -51,6 +51,7 @@ export class PostController {
         author: true,
       },
     });
+   
     res.send(results);
   };
 
@@ -58,11 +59,16 @@ export class PostController {
     const {id: userId} = req.decoded
 
     const currentPost = await myDataBase.getRepository(Post).findOne({
-      where: {postId: req.params.id},
+      where: {postId: req.params.postId},
       relations: {
         author: true
       }
     })
+    
+    if (!currentPost) {
+      return res.status(404).send("Post not found");
+    }
+
     if(userId !== currentPost.author.id) {
       return res.status(401).send('No Permission')
     }
@@ -72,25 +78,27 @@ export class PostController {
     newPost.content = content 
     newPost.tags = tags
 
-    const results = await myDataBase.getRepository(Post).update(
-      req.params.id,
-      newPost
-    )
-    res.send(results)
+    const results = await myDataBase.getRepository(Post).update({postId:req.params.postId},newPost)
+    res.send({message:"게시글이 수정되었습니다."})
   }
 
-  static deletePost = async (req:JwtRequest, res:Response) => {
-    const {id: userId} = req.decoded
+  static deletePost = async (req: JwtRequest, res: Response) => {
+    const { id: userId } = req.decoded;
     const currentPost = await myDataBase.getRepository(Post).findOne({
-      where:{postId: req.params.id},
-      relations:{
-        author: true
-      }
-    })
-    if(userId!== currentPost.author.id) {
-      return res.status(401).send('No Permisson')
+      where: { postId: req.params.postId },
+      relations: {
+        author: true,
+      },
+    });
+    if (!currentPost) {
+      return res.status(404).send("해당 ID의 게시물을 찾을 수 없습니다.");
     }
-    const results = await myDataBase.getRepository(Post).delete(req.params.id)
-    res.send(results)
-  }
+    if (userId !== currentPost.author.id) {
+      return res.status(401).send("작성자 본인이 아닙니다.");
+    }
+   
+      const results = await myDataBase.getRepository(Post).delete({postId:req.params.postId});
+      res.status(204).send({message: "삭제 완료되었습니다."})
+    
+  };
 }
