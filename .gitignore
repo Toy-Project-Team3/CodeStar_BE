@@ -137,3 +137,5 @@ dist
 
 .idea/
 .obsidian/
+
+myapp_key.pem
