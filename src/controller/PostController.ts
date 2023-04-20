@@ -53,4 +53,44 @@ export class PostController {
     });
     res.send(results);
   };
+
+  static updatePost = async (req: JwtRequest, res: Response) => {
+    const {id: userId} = req.decoded
+
+    const currentPost = await myDataBase.getRepository(Post).findOne({
+      where: {postId: req.params.id},
+      relations: {
+        author: true
+      }
+    })
+    if(userId !== currentPost.author.id) {
+      return res.status(401).send('No Permission')
+    }
+    const {title, content, tags} = req.body
+    const newPost = new Post()
+    newPost.title = title
+    newPost.content = content 
+    newPost.tags = tags
+
+    const results = await myDataBase.getRepository(Post).update(
+      req.params.id,
+      newPost
+    )
+    res.send(results)
+  }
+
+  static deletePost = async (req:JwtRequest, res:Response) => {
+    const {id: userId} = req.decoded
+    const currentPost = await myDataBase.getRepository(Post).findOne({
+      where:{postId: req.params.id},
+      relations:{
+        author: true
+      }
+    })
+    if(userId!== currentPost.author.id) {
+      return res.status(401).send('No Permisson')
+    }
+    const results = await myDataBase.getRepository(Post).delete(req.params.id)
+    res.send(results)
+  }
 }
