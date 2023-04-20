@@ -4,9 +4,10 @@ import { User } from '../entity/User';
 import { JwtRequest } from '../interface/interfaces';
 import { Response, Request } from 'express';
 
+
 export class PostController {
   static createPost = async (req: JwtRequest, res: Response) => {
-    const { title, content } = req.body;
+    const { title, content, tags } = req.body;
     const { id: userId } = req.decoded;
 
     const user = await myDataBase.getRepository(User).findOne({
@@ -17,6 +18,7 @@ export class PostController {
     post.title = title;
     post.content = content;
     post.author = user;
+    post.tags = tags;
 
     const result = await myDataBase.getRepository(Post).insert(post);
     res.status(201).send(result);
