@@ -25,7 +25,7 @@ app.use(
 );
 
 app.use('/auth', AuthRouter);
-app.use('/post', PostRouter);
+app.use('/posts', PostRouter);
 
 const port = process.env.PORT || 3000;
 
