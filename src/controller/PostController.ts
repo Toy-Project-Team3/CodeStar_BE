@@ -35,7 +35,7 @@ export class PostController {
           id: true,
           userId: true,
           userName: true,
-          profileImg:true
+          profileImg: true,
         },
       },
       relations: {
@@ -57,36 +57,35 @@ export class PostController {
         profileImg: true,
         bio: true,
         commentList: true,
-        creditScore:true,
+        creditScore: true,
+      },
+      relations: {
+        postList: true,
+        commentList: true,
+      },
+    });
 
-      },
-      relations:{
-        postList:true,
-        commentList:true,
-      }
-    });
-  
     const results = await myDataBase.getRepository(Post).find({
-      where: { author: {userId:user.userId} },
+      where: { author: { userId: user.userId } },
       select: {
-              postId:true, 
-              title:true,
-              content:true, 
-              createdAt:true, 
-              author:{
-                  userId: true,
-                  userName:true,
-                  profileImg:true,
-                  creditScore:true,
-                  bio:true
-              },
+        postId: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        author: {
+          userId: true,
+          userName: true,
+          profileImg: true,
+          creditScore: true,
+          bio: true,
+        },
       },
-      relations:{
-        author:true,
-        commentList:true
+      relations: {
+        author: true,
+        commentList: true,
       },
     });
-    console.log(res)
+    console.log(res);
     try {
       res.status(200).send(results);
     } catch (err) {
@@ -99,37 +98,35 @@ export class PostController {
       where: { userId: req.params.userId },
     });
     const results = await myDataBase.getRepository(Post).findOne({
-      where: { author: {userId: user.userId},title: req.params.title },
+      where: { author: { userId: user.userId }, title: req.params.title },
       select: {
-        author:{
+        author: {
           id: true,
           userId: true,
           userName: true,
           profileImg: true,
-          creditScore:true,
-          
+          creditScore: true,
         },
-        commentList:{
-          commentId:true,
-          content:true,
+        commentList: {
+          commentId: true,
+          content: true,
           createdAt: true,
-          author:{
+          author: {
             id: true,
             userId: true,
             userName: true,
-            profileImg: true
-            },
-          }
-      
+            profileImg: true,
+          },
+        },
       },
       relations: {
         author: true,
         commentList: {
-          author:true
+          author: true,
         },
       },
     });
-    console.log(results)
+    console.log(results);
     try {
       res.status(200).send(results);
     } catch (err) {
@@ -139,17 +136,17 @@ export class PostController {
   /**게시글 수정*/
   static updatePost = async (req: JwtRequest, res: Response) => {
     const { userId: userId } = req.decoded;
-    const {title, content} = req.body;
+    const { title, content } = req.body;
     const user = await myDataBase.getRepository(User).findOne({
-      where: {userId: req.params.userId },
+      where: { userId: req.params.userId },
     });
     const currentPost = await myDataBase.getRepository(Post).findOne({
-      where: { author:{userId: user.userId}, title: req.params.title},
+      where: { author: { userId: user.userId }, title: req.params.title },
       relations: {
         author: true,
       },
     });
-  
+
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
@@ -162,7 +159,7 @@ export class PostController {
     newPost.content = content;
 
     const results = await myDataBase.getRepository(Post).update({ title: req.params.title }, newPost);
-    console.log(results)
+    console.log(results);
     try {
       res.status(200).json({ message: '게시글이 수정되었습니다.' });
     } catch (err) {
@@ -188,6 +185,4 @@ export class PostController {
     const results = await myDataBase.getRepository(Post).delete({ postId: req.params.postId });
     res.status(204).json({ message: '삭제 완료되었습니다.' });
   };
-
-
 }
