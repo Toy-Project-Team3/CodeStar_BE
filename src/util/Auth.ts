@@ -11,17 +11,17 @@ export const generatePassword = async (pw: string) => {
   return password;
 };
 
-export const generateAccessToken = (id: string, username: string, userId: string) => {
+export const generateAccessToken = (id: string,  userId: string, userName: string) => {
     return jwt.sign(
-        { id, username, userId },
+        { id,  userId, userName},
         process.env.SECRET_ATOKEN,
         {expiresIn: '1h'}
     )
 };
 
-export const generanteRefreshToken = (id: string, username: string, userId:string ) => {
+export const generanteRefreshToken = (id: string, userId:string,  userName: string ) => {
     return jwt.sign(
-        {id, username, userId},
+        {id, userId, userName},
         process.env.SECRET_RTOKEN,
         {expiresIn: '30d'}
         )
