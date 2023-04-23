@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { verify } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { generanteRefreshToken, generateAccessToken, generatePassword, registerToken } from '../util/Auth';
+import { JwtRequest } from '../interface/interfaces';
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ export class UserController {
       });
     }
 
-    const userNameRegex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣._-]{3,20}$/;
+    const userNameRegex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣._-]{1,20}$/;
     if (!userNameRegex.test(userName)) {
       return res.status(400).json({ message: '유효한 닉네임이 아닙니다.' });
     }
@@ -69,8 +70,64 @@ export class UserController {
     res.send({ content: decoded, accessToken });
   };
 
-  static logout = (req: Request, res: Response) => {
+  static logout = async (req: Request, res: Response) => {
     res.clearCookie('refreshToken', { path: '/' });
-    res.status(204).json({message: '로그 아웃되었습니다.'});
+    res.status(204).json({ message: '로그 아웃되었습니다.' });
+  };
+
+  static getMyInfo = async (req: JwtRequest, res: Response) => {
+    const { id: id, userId: userId } = req.decoded;
+
+    const results = await myDataBase.getRepository(User).findOne({
+      where: { userId: userId },
+      select: {
+        id: true,
+        userId: true,
+        userName: true,
+        profileImg: true,
+        bio: true,
+        creditScore: true,
+        commentList:{
+        commentId: true,
+         content: true,
+         createdAt: true,
+            author: {
+              id: true,
+              userId: true,
+              userName: true,
+            }, 
+            post: {
+              postId:true,
+              title: true,
+              content: true,
+              author: {
+                id: true,
+                userId:true,
+                userName:true,
+                profileImg: true,
+              }
+            }
+
+        },
+      },
+      relations: {
+        postList: true,
+        commentList: {
+          post:{
+            author:true
+          },
+          author:true
+        },
+      },
+    });
+
+    if (!results) {
+      return res.status(404).json({ message: '유저를 찾을 수 없습니다.' });
+    }
+    if (userId !== results.userId && id !== results.id) {
+      return res.status(403).json({ message: '해당 페이지에 권한이 없습니다.' });
+    }
+
+    return res.status(200).send(results);
   };
 }
