@@ -57,6 +57,7 @@ export class CommentController {
   };
 
   static getComments = async (req: JwtRequest, res: Response) => {
+    const {id: userId }= req.decoded 
     const results = await myDataBase.getRepository(Comment).find({
       select: {
         author: {
@@ -71,7 +72,10 @@ export class CommentController {
       },
     });
     try {
-      res.status(200).send(results);
+      if(!userId){
+
+        res.status(200).send(results);
+      }
     } catch (err) {
       res.status(404).json({ message: '댓글들을 찾을 수 없습니다.' });
     }
@@ -133,6 +137,9 @@ export class CommentController {
     })
 
     const results = await myDataBase.getRepository(Comment).delete(currentComment.commentId)
-    res.status(204).json({message: '댓글 삭제가 완료되었습니다.'})
+    if(userId === currentComment.author.id){
+
+      return res.status(204).json({message: '댓글 삭제가 완료되었습니다.'})
+    }
   }
 }
