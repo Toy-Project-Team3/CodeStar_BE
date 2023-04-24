@@ -1,6 +1,7 @@
 import { myDataBase } from '../../db';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
+import { Comment } from '../entity/Comment';
 import { JwtRequest } from '../interface/interfaces';
 import { Response, Request } from 'express';
 
@@ -126,7 +127,7 @@ export class PostController {
         },
       },
     });
-    console.log(results);
+
     try {
       res.status(200).send(results);
     } catch (err) {
@@ -142,11 +143,17 @@ export class PostController {
     });
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { author: { userId: user.userId }, title: req.params.title },
+      select: {
+        author: {
+          id: true,
+          userId: true,
+          userName: true,
+        }
+      },
       relations: {
         author: true,
       },
     });
-
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
@@ -157,6 +164,7 @@ export class PostController {
     const newPost = new Post();
     newPost.title = title;
     newPost.content = content;
+  
 
     const results = await myDataBase.getRepository(Post).update({ title: req.params.title }, newPost);
     console.log(results);
@@ -169,20 +177,33 @@ export class PostController {
 
   static deletePost = async (req: JwtRequest, res: Response) => {
     const { id: userId } = req.decoded;
+    
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { postId: req.params.postId },
+      select:{
+        author:{
+          id: true,
+          userId: true,
+          userName: true,
+        }
+      },
       relations: {
         author: true,
       },
     });
+    const postComment = await myDataBase.getRepository(Comment).find({
+      where: { post: currentPost },
+    });
+    await myDataBase.getRepository(Comment).remove(postComment);
+    console.log(postComment);
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
     if (userId !== currentPost.author.id) {
-      return res.status(401).json({ message: '작성자 본인이 아닙니다.' });
+      return res.status(401).json({ message: '게시글 작성자 본인이 아닙니다.' });
     }
-
-    const results = await myDataBase.getRepository(Post).delete({ postId: req.params.postId });
-    res.status(204).json({ message: '삭제 완료되었습니다.' });
+    console.log(currentPost);
+    const results = await myDataBase.getRepository(Post).delete(currentPost.postId);
+    res.status(204).json({ message: '게시글 삭제 완료되었습니다.' });
   };
 }

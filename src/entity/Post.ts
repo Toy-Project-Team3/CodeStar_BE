@@ -2,11 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './User';
+import { Comment } from './Comment';
+import { Like } from './Like';
 
 @Entity()
 export class Post {
@@ -16,8 +20,10 @@ export class Post {
   title: string;
   @Column()
   content: string;
-  @Column('simple-array', { nullable: true })
-  tags: string[];
+  @OneToMany(()=> Comment, (comment)=> comment.post,  { cascade: true } )
+  commentList: Comment[]
+  @OneToMany(()=> Like, likes=> likes.post)
+  likes: Like[]
   @ManyToOne(() => User, (user) => user.postList)
   author: User;
   @CreateDateColumn()
