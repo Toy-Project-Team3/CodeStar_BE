@@ -14,7 +14,8 @@ routes.delete('/:postId', AuthMiddleware.verifiyToken, PostController.deletePost
 routes.get('/:userId', PostController.getAuthorPosts)
 routes.get('/:userId/:title', PostController.getAuthorPost);
 routes.post('/:userId/:title/comments', AuthMiddleware.verifiyToken, CommentController.createComment)
-
+routes.put('/:userId/:title/comments/:commentId', AuthMiddleware.verifiyToken, CommentController.updateComment)
+routes.delete('/:userId/:title/comments/:commentId', AuthMiddleware.verifiyToken, CommentController.deleteComment)
 
 
 export default routes;
