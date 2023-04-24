@@ -3,6 +3,7 @@ import { myDataBase } from '../db';
 import cors from 'cors';
 import AuthRouter from './router/auth';
 import PostRouter from './router/post';
+import CommentRouter from './router/comment'
 export const tokenList = {};
 
 myDataBase
@@ -26,6 +27,7 @@ app.use(
 
 app.use('/auth', AuthRouter);
 app.use('/posts', PostRouter);
+app.use('/comments', CommentRouter);
 
 const port = process.env.PORT || 3000;
 
