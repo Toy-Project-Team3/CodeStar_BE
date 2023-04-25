@@ -11,6 +11,7 @@ import {
 import { User } from './User';
 import { Comment } from './Comment';
 import { Like } from './Like';
+import {Dislike} from './Dislike'
 
 @Entity()
 export class Post {
@@ -24,8 +25,14 @@ export class Post {
   commentList: Comment[]
   @OneToMany(()=> Like, likes=> likes.post)
   likes: Like[]
+  @OneToMany(()=> Dislike, dislikes=> dislikes.post)
+  DisLikes: Dislike[]
   @ManyToOne(() => User, (user) => user.postList)
   author: User;
+  @Column()
+  thumbnail: string
+  @Column({ type: 'boolean', default: false })
+  isPrivate: boolean;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

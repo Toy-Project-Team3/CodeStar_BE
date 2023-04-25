@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm"
+import { DataSource, DatabaseType } from "typeorm"
 import dotenv from 'dotenv'
 
 dotenv.config()
