@@ -11,13 +11,13 @@ export class AuthMiddleware {
     const token = authHeader && authHeader.split(' ')[1];
    
     if (!token) {
-      return res.status(403).send('A token is required');
+      return res.status(403).json({message: '접근이 불가능합니다.'});
     }
     try {
       const decoded = verify(token, process.env.SECRET_ATOKEN) as TokenPayload;
       req.decoded = decoded;
     } catch (err) {
-      return res.status(401).send('Invalid Token');
+      return res.status(401).json({message: '로그인이 필요합니다.'});
     }
     return next();
   };

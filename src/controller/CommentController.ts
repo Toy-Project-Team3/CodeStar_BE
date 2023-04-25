@@ -71,22 +71,22 @@ export class CommentController {
         post: true,
       },
     });
-    try {
-      if(!userId){
+   
 
-        res.status(200).send(results);
-      }
-    } catch (err) {
       res.status(404).json({ message: '댓글들을 찾을 수 없습니다.' });
+    try {
+     
+        res.status(200).send(results);
+      
+    } catch (err) {
+      res.status(500).json({message: '댓글들을 조회 중 오류가 발생하였습니다.'})
     }
   };
 
   static updateComment = async(req: JwtRequest, res: Response) => {
     const {id: userId} = req.decoded
     const { content, commentId } = req.body
-  
-
-   
+    
     const post = await myDataBase.getRepository(Post).findOne({
       where: { title :req.params.title},
       select:{
@@ -124,7 +124,7 @@ export class CommentController {
       const results = await myDataBase.getRepository(Comment).update({commentId: comment.commentId}, newComment)
     }
     try {
-      res.status(200).json({ message: '댓글이 수정되었습니다.' });
+      res.status(201).json({ message: '댓글이 수정되었습니다.' });
     } catch (err) {
       res.status(500).json({ message: '댓글 작성 중 오류가 발생했습니다.' });
     }
@@ -134,12 +134,28 @@ export class CommentController {
     const {id: userId} = req.decoded
     const currentComment = await myDataBase.getRepository(Comment).findOne({
       where:{commentId: req.params.commentId},
+      select:{
+        author: {
+          id: true
+        }
+      }
     })
+      
+    if(!currentComment.commentId){
+      return res.status(404).json({message: '해당 댓글을 찾을 수 없습니다.'})
+    }
 
+    if(!currentComment.author.id){
+      return res.status(401).json({message: '댓글 작성자 본인이 아닙니다.'})
+    }
+  try{
     const results = await myDataBase.getRepository(Comment).delete(currentComment.commentId)
     if(userId === currentComment.author.id){
 
       return res.status(204).json({message: '댓글 삭제가 완료되었습니다.'})
     }
+  }catch (err){
+    return res.status(500).json({message: '댓글 삭제 중 오류가 발생했습니다. '})
+  }
   }
 }
