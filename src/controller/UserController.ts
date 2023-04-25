@@ -164,7 +164,8 @@ export class UserController {
   static updateMyInfo = async (req: UploadS3Request, res: Response) => {
     const { id: id, userId: userId } = req.decoded;
     const { bio, userName } = req.body;
-    const [profileImg] = req.files;
+    const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
+    const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail')   
     const user = await myDataBase.getRepository(User).findOne({
       where: { userId: req.params.userId },
       select: {
@@ -179,7 +180,7 @@ export class UserController {
     const newUser = new User();
     newUser.bio = bio;
     newUser.userName = userName;
-    newUser.profileImg = profileImg.location;
+    profileImg && (newUser.profileImg = profileImg.location)
 
     const results = await myDataBase.getRepository(User).update({ userId: req.params.userId }, newUser);
     console.log(results);
