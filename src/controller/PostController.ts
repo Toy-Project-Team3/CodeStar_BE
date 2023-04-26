@@ -10,13 +10,13 @@ export class PostController {
   /**게시글 생성*/
   static createPost = async (req:UploadS3Request, res:Response) => {
     const { title, content, isPrivate } = req.body;
-    const { id: userId } = req.decoded;
+    const { id } = req.decoded;
     
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail')   
 
     const user = await myDataBase.getRepository(User).findOne({
-      where: { id: userId },
+      where: { id },
     });
 
     if (title === '' && content === '') {
@@ -63,7 +63,7 @@ export class PostController {
 
   static getAuthorPosts = async (req: Request, res: Response) => {
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.userId },
+      where: { id: req.params.id },
       select: {
         id: true,
         userId: true,
@@ -85,7 +85,7 @@ export class PostController {
     });
 
     const results = await myDataBase.getRepository(Post).find({
-      where: { author: { userId: user.userId } },
+      where: { author: { id: user.id } },
       select: {
         postId: true,
         title: true,
@@ -123,14 +123,14 @@ export class PostController {
 
   static getAuthorPost = async (req: Request, res: Response) => {
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.userId },
+      where: { userId: req.params.id },
       relations: {
         credits: true,
       
       },
     });
     const results = await myDataBase.getRepository(Post).findOne({
-      where: { author: { userId: user.userId }, title: req.params.title },
+      where: { author: { id: user.id }, postId: req.params.postId },
       select: {
         likes:true,
         author: {
@@ -174,17 +174,17 @@ export class PostController {
   };
   /**게시글 수정*/
   static updatePost = async (req: UploadS3Request, res: Response) => {
-    const { userId: userId } = req.decoded;
+    const { userId: id } = req.decoded;
     const { title, content } = req.body;
 
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail') 
     
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.userId },
+      where: { userId: req.params.id },
     });
     const currentPost = await myDataBase.getRepository(Post).findOne({
-      where: { author: { userId: user.userId }, title: req.params.title },
+      where: { author: { id: user.id }, postId: req.params.postId },
       select: {
         author: {
           id: true,
@@ -199,7 +199,7 @@ export class PostController {
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
-    if (userId !== currentPost.author.userId) {
+    if (user.id !== currentPost.author.id) {
       return res.status(401).json({ message: '작성자 본인이 아닙니다.' });
     }
     const newPost = new Post();
@@ -207,7 +207,7 @@ export class PostController {
     newPost.content = content;
     thumbnail && (newPost.thumbnail = thumbnail.location)
     
-    const results = await myDataBase.getRepository(Post).update({ title: req.params.title }, newPost);
+    const results = await myDataBase.getRepository(Post).update({ postId: req.params.postId }, newPost);
     try {
       res.status(200).json({ message: '게시글이 수정되었습니다.' });
     } catch (err) {

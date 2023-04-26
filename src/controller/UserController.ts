@@ -102,7 +102,7 @@ export class UserController {
     const { id: id, userId: userId } = req.decoded;
 
     const results = await myDataBase.getRepository(User).findOne({
-      where: { userId: userId },
+      where: { id: id },
       select: {
         id: true,
         userId: true,
@@ -167,7 +167,7 @@ export class UserController {
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail')   
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.userId },
+      where: { id: req.params.id },
       select: {
         bio: true,
         userName: true,
