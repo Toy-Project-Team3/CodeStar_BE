@@ -60,5 +60,49 @@ export class LikeController {
       return res.status(500).json({ message: "서버 에러가 발생했습니다." });
     }
   };
+
+  static getLikePost = async(req: JwtRequest, res: Response) => {
+    const {id} = req.decoded
+    const user = await myDataBase.getRepository(User).findOne({
+      where: { id: req.params.id },
+    
+    });
+
+    const results = await myDataBase.getRepository(Like).findOne({
+      where: {user: {id: user.id}},
+      select: {
+        post: {
+          postId: true,
+          title: true,
+          content: true,
+          author:{
+            id: true,
+            userId: true,
+            userName: true
+          },
+
+        }
+      },
+      relations: {
+        user: true,
+        post: true
+      }
+
+    })
+
+    
+    if(id !== results.user.id){
+
+      res.status(404).json({ message: '해당 포스트를 찾을 수 없습니다.' });
+    }
+   try {
+    if(id === results.user.id)
+       res.status(200).send(results);
+     
+   } catch (err) {
+     res.status(500).json({message: '포스트 조회중 오류가 발생하였습니다.'})
+   }
+
+  }
   
 }

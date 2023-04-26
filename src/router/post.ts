@@ -15,6 +15,7 @@ routes.put('/:postId',upload.any(), AuthMiddleware.verifiyToken, PostController.
 routes.delete('/:postId', AuthMiddleware.verifiyToken, PostController.deletePost)
 routes.get('/:userId', PostController.getAuthorPosts)
 routes.get('/:userid/:postId', PostController.getAuthorPost);
+routes.get('/:userId/:postId/like',AuthMiddleware.verifiyToken, LikeController.getLikePost);
 routes.post('/:userId/:postId/like',AuthMiddleware.verifiyToken, LikeController.likePost);
 routes.post('/:userId/:postId/dislike',AuthMiddleware.verifiyToken, DisLikeController.dislikePost);
 routes.post('/:userId/:postId/comments', AuthMiddleware.verifiyToken, CommentController.createComment)

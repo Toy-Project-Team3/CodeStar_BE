@@ -152,6 +152,8 @@ export class PostController {
         dislikes: true,
         isPrivate:true,
         thumbnail: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           id: true,
           userId: true,
