@@ -133,7 +133,8 @@ export class PostController {
     }
   };
 
-  static getAuthorPost = async (req: Request, res: Response) => {
+  static getAuthorPost = async (req: JwtRequest, res: Response) => {
+    const {id } = req.decoded
     const user = await myDataBase.getRepository(User).findOne({
       where: { userId: req.params.id },
       relations: {
@@ -147,6 +148,7 @@ export class PostController {
         postId: true,
         likes:true,
         dislikes: true,
+        isPrivate:true,
         author: {
           id: true,
           userId: true,
@@ -181,6 +183,17 @@ export class PostController {
       },
     });
 
+    if (results.isPrivate) {
+      // 요청한 유저가 게시글 작성자이거나 관리자인 경우에만 조회 가능
+      if ( id === results.author.id ) {
+        res.status(200).send(results);
+        return;
+      } else {
+        res.status(403).json({ message: '해당 게시글은 비공개 상태입니다.' });
+        return;
+      }
+    }
+
     try {
       res.status(200).send(results);
     } catch (err) {
@@ -190,7 +203,7 @@ export class PostController {
   /**게시글 수정*/
   static updatePost = async (req: UploadS3Request, res: Response) => {
     const { userId: id } = req.decoded;
-    const { title, content } = req.body;
+    const { title, content, isPrivate } = req.body;
 
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail') 
@@ -221,6 +234,7 @@ export class PostController {
     const newPost = new Post();
     newPost.title = title;
     newPost.content = content;
+    newPost.isPrivate = isPrivate
     thumbnail && (newPost.thumbnail = thumbnail.location)
     
     const results = await myDataBase.getRepository(Post).update({ postId: req.params.postId }, newPost);
