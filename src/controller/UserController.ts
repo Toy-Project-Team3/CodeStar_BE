@@ -182,7 +182,7 @@ export class UserController {
     newUser.userName = userName;
     profileImg && (newUser.profileImg = profileImg.location)
 
-    const results = await myDataBase.getRepository(User).update({ userId: req.params.userId }, newUser);
+    const results = await myDataBase.getRepository(User).update({ id: req.params.id }, newUser);
     console.log(results);
     try {
       res.status(200).json({ message: '내 정보가 수정되었습니다.' });
