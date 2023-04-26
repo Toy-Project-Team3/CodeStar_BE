@@ -26,7 +26,7 @@ export class Post {
   @OneToMany(()=> Like, likes=> likes.post)
   likes: Like[]
   @OneToMany(()=> Dislike, dislikes=> dislikes.post)
-  DisLikes: Dislike[]
+  dislikes: Dislike[]
   @ManyToOne(() => User, (user) => user.postList)
   author: User;
   @Column()

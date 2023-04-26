@@ -11,9 +11,9 @@ export class LikeController {
     try {
       const isExist = await myDataBase.getRepository(Like).findOne({
         where: {
-          user: { userId: req.body.userId },
+          user: { id: req.body.id },
           post: { postId: req.params.postId },
-          credit: { creditScoreId: req.params.creditScore },
+          credit: { creditScoreId: req.params.creditScoreId },
         },
       });
   
@@ -22,7 +22,7 @@ export class LikeController {
           postId: req.params.postId,
         });
         const user = await myDataBase.getRepository(User).findOneBy({
-          userId: req.params.userId,
+          id: req.params.id,
         });
         const credit = await myDataBase.getRepository(Credit).findOneBy({
           creditScoreId: req.params.creditScoreId,
@@ -32,7 +32,7 @@ export class LikeController {
         like.user = user;
         like.credit = credit;
         await myDataBase.getRepository(Like).insert(like);
-  
+        console.log(like)
        
         const creditScore = await myDataBase
           .getRepository(Credit)

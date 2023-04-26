@@ -11,18 +11,18 @@ export class DisLikeController {
     try {
       const isExist = await myDataBase.getRepository(Dislike).findOne({
         where: {
-          user: { userId: req.body.userId },
+          user: { id: req.body.id },
           post: { postId: req.params.postId },
-          credit: { creditScoreId: req.params.creditScore },
+          credit: { creditScoreId: req.params.creditScoreId },
         },
       });
-
+  
       if (!isExist) {
         const post = await myDataBase.getRepository(Post).findOneBy({
           postId: req.params.postId,
         });
         const user = await myDataBase.getRepository(User).findOneBy({
-          userId: req.params.userId,
+          id: req.params.id,
         });
         const credit = await myDataBase.getRepository(Credit).findOneBy({
           creditScoreId: req.params.creditScoreId,
@@ -32,7 +32,7 @@ export class DisLikeController {
         dislike.user = user;
         dislike.credit = credit;
         await myDataBase.getRepository(Dislike).insert(dislike);
-
+       console.log(dislike)
         const creditScore = await myDataBase
           .getRepository(Credit)
           .findOne({ where: { creditScoreId: req.params.creditScoreId } });

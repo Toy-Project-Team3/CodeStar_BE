@@ -6,11 +6,11 @@ import { Credit } from "./Credit";
 @Entity()
 export class Dislike{
     @PrimaryGeneratedColumn('uuid')
-    disLikeId: string
-    @ManyToOne(()=> User, user => user.likes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    dislikeId: string
+    @ManyToOne(()=> User, user => user.dislikes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     user:User
-    @ManyToOne(()=> Post, post => post.likes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(()=> Post, post => post.dislikes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     post: Post
-    @ManyToOne(()=> Credit, creditscore => creditscore.likes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(()=> Credit, creditscore => creditscore.dislikes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     credit: Credit
 }

@@ -12,7 +12,7 @@ export class Credit {
     @OneToMany(()=> Like, likes=> likes.post)
     likes: Like[]
     @OneToMany(()=> Dislike, dislikes=> dislikes.post)
-    disLikes: Dislike[]
+    dislikes: Dislike[]
     @OneToOne(()=> User,user=>  user.credits)
     @JoinColumn()
     owner: User

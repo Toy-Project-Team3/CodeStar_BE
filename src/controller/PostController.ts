@@ -141,6 +141,7 @@ export class PostController {
       select: {
         postId: true,
         likes:true,
+        dislikes: true,
         author: {
           id: true,
           userId: true,
@@ -164,6 +165,7 @@ export class PostController {
         },
       },
       relations: {
+        dislikes:true,
         likes:true,
         author: {
           credits: true,

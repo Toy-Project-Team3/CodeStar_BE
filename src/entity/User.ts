@@ -35,8 +35,8 @@ export class User {
   commentList: Comment[];
   @OneToMany(() => Like, (likes) => likes.user)
   likes: Like[];
-  @OneToMany(() => Dislike, (disLikes) => disLikes.user)
-  disLikes: Dislike[];
+  @OneToMany(() => Dislike, (dislikes) => dislikes.user)
+  dislikes: Dislike[];
   @OneToOne(() => Credit, (credit) => credit.owner, { cascade: true })
   @JoinColumn()
   credits: Credit;
