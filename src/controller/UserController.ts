@@ -30,7 +30,14 @@ export class UserController {
     const existUser = await myDataBase.getRepository(User).findOne({
       where: [{ userId }, { userName }],
     });
-    if (existUser) {
+    if (existUser.userId) {
+      return res.status(400).json({ message: '중복된 아이디입니다.' });
+    }
+    if (existUser.userName) {
+      return res.status(400).json({ message: '중복된 이름입니다.' });
+    }
+
+    if(existUser.userId && existUser.userName) {
       return res.status(400).json({ message: '중복된 아이디와 이름입니다.' });
     }
 
