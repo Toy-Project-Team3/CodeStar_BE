@@ -11,15 +11,16 @@ import { UploadS3Request} from '../interface/interfaces'
 export class PostController {
   /**게시글 생성*/
   static createPost = async (req:UploadS3Request, res:Response) => {
-    const { title, content, isPrivate, } = req.body;
+    const { title, content, isPrivate } = req.body;
     console.log(req)
     const { id: id } = req.decoded;
+  
     
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail')   
 
     const user = await myDataBase.getRepository(User).findOne({
-      where: { id: req.params.id },
+      where: { id: id },
     });
 
     if (title === '' && content === '') {
@@ -70,10 +71,8 @@ export class PostController {
     }
   };
 
-  static getAuthorPosts = async (req: JwtRequest, res: Response) => {
-    const {id: id } = req.decoded
-    
-    console.log(id)
+  static getAuthorPosts = async (req: Request, res: Response) => {
+  
     const user = await myDataBase.getRepository(User).findOne({
       where: { id: req.params.id },
       select: {
@@ -95,9 +94,9 @@ export class PostController {
         credits: true,
       },
     });
-
+  
     const results = await myDataBase.getRepository(Post).find({
-      where: { author: { id: user.id }, isPrivate: false },
+      where: { author: { id: user.id }},
       select: {
         postId: true,
         title: true,
@@ -106,6 +105,7 @@ export class PostController {
         isPrivate: true,
         thumbnail: true,
         author: {
+          id: true,
           userId: true,
           userName: true,
           profileImg: true,
@@ -125,7 +125,7 @@ export class PostController {
     });
 
     const filteredResults = results.filter(post => {
-      return !post.isPrivate || post.author.id === id;
+      return !post.isPrivate || post.author.id === user.id;
     });
     if(!filteredResults) {
       res.status(404).json({ message: '게시글들을 찾을 수 없습니다.' });
@@ -138,8 +138,8 @@ export class PostController {
     }
   };
 
-  static getAuthorPost = async (req: JwtRequest, res: Response) => {
-    const {id: id } = req.decoded
+  static getAuthorPost = async (req: Request, res: Response) => {
+   
     const user = await myDataBase.getRepository(User).findOne({
       where: { id: req.params.id },
       relations: {
@@ -193,7 +193,7 @@ export class PostController {
 
     if (results.isPrivate) {
       // 요청한 유저가 게시글 작성자이거나 관리자인 경우에만 조회 가능
-      if ( id === results.author.id ) {
+      if ( user.id === results.author.id ) {
         res.status(200).send(results);
         return;
       } else {
@@ -236,7 +236,7 @@ export class PostController {
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
-    if (user.id !== currentPost.author.id) {
+    if (id !== currentPost.author.id) {
       return res.status(401).json({ message: '작성자 본인이 아닙니다.' });
     }
     const newPost = new Post();
