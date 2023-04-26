@@ -2,6 +2,8 @@ import { myDataBase } from '../../db';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
 import { Comment } from '../entity/Comment';
+import { Like } from '../entity/Like';
+import { Dislike } from '../entity/Dislike';
 import { JwtRequest } from '../interface/interfaces';
 import { Response, Request } from 'express';
 import { UploadS3Request} from '../interface/interfaces'
@@ -40,7 +42,11 @@ export class PostController {
     const results = await myDataBase.getRepository(Post).find({
       
       select: {
+        postId: true,
+        title: true,
+        content: true,
         isPrivate: true,
+        likes: true,
         author: {
           id: true,
           userId: true,
@@ -51,6 +57,7 @@ export class PostController {
       relations: {
         author: true,
         commentList: true,
+        likes: true
       },
     });
     try{
@@ -132,6 +139,7 @@ export class PostController {
     const results = await myDataBase.getRepository(Post).findOne({
       where: { author: { id: user.id }, postId: req.params.postId },
       select: {
+        postId: true,
         likes:true,
         author: {
           id: true,
@@ -186,6 +194,7 @@ export class PostController {
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { author: { id: user.id }, postId: req.params.postId },
       select: {
+        postId: true,
         author: {
           id: true,
           userId: true,
@@ -221,6 +230,7 @@ export class PostController {
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { postId: req.params.postId },
       select: {
+        postId: true,
         author: {
           id: true,
           userId: true,
@@ -235,7 +245,14 @@ export class PostController {
       where: { post: currentPost },
     });
     await myDataBase.getRepository(Comment).remove(postComment);
-    
+    const postLike = await myDataBase.getRepository(Like).find({
+      where: { post: currentPost },
+    });
+    await myDataBase.getRepository(Like).remove(postLike)
+    const postDislike = await myDataBase.getRepository(Dislike).find({
+      where: { post: currentPost },
+    });
+    await myDataBase.getRepository(Dislike).remove(postDislike)
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
