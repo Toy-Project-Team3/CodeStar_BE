@@ -57,13 +57,13 @@ export class CommentController {
   };
 
   static getComments = async (req: JwtRequest, res: Response) => {
-    const {id: userId }= req.decoded 
+    const {id }= req.decoded 
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.id },
+      where: { id: req.params.id },
     
     });
     const results = await myDataBase.getRepository(Comment).findOne({
-      where:{author:{id: user.userId}},
+      where:{author:{id: user.id}},
       select: {
         author: {
           id: true,
@@ -77,10 +77,12 @@ export class CommentController {
       },
     });
    
+     if(id !== results.author.id){
 
-      res.status(404).json({ message: '댓글들을 찾을 수 없습니다.' });
+       res.status(404).json({ message: '댓글들을 찾을 수 없습니다.' });
+     }
     try {
-     if(userId === results.author.id)
+     if(id === results.author.id)
         res.status(200).send(results);
       
     } catch (err) {
