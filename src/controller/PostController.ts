@@ -102,6 +102,7 @@ export class PostController {
         title: true,
         content: true,
         createdAt: true,
+        likes: true,
         isPrivate: true,
         thumbnail: true,
         author: {
@@ -121,6 +122,7 @@ export class PostController {
           credits: true,
         },
         commentList: true,
+        likes: true
       },
     });
 
