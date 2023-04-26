@@ -11,14 +11,15 @@ import { UploadS3Request} from '../interface/interfaces'
 export class PostController {
   /**게시글 생성*/
   static createPost = async (req:UploadS3Request, res:Response) => {
-    const { title, content, isPrivate } = req.body;
-    const { id } = req.decoded;
+    const { title, content, isPrivate, } = req.body;
+    console.log(req)
+    const { id: id } = req.decoded;
     
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail')   
 
     const user = await myDataBase.getRepository(User).findOne({
-      where: { id },
+      where: { id: req.params.id },
     });
 
     if (title === '' && content === '') {
@@ -70,7 +71,9 @@ export class PostController {
   };
 
   static getAuthorPosts = async (req: JwtRequest, res: Response) => {
-    const {id } = req.decoded
+    const {id: id } = req.decoded
+    
+    console.log(id)
     const user = await myDataBase.getRepository(User).findOne({
       where: { id: req.params.id },
       select: {
@@ -136,9 +139,9 @@ export class PostController {
   };
 
   static getAuthorPost = async (req: JwtRequest, res: Response) => {
-    const {id } = req.decoded
+    const {id: id } = req.decoded
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.id },
+      where: { id: req.params.id },
       relations: {
         credits: true,
       
@@ -207,14 +210,14 @@ export class PostController {
   };
   /**게시글 수정*/
   static updatePost = async (req: UploadS3Request, res: Response) => {
-    const { userId: id } = req.decoded;
+    const {id: id } = req.decoded;
     const { title, content, isPrivate } = req.body;
 
     const profileImg = req?.files.find(file => file.fieldname === 'profileImg');
     const thumbnail = req?.files.find(file => file.fieldname === 'thumbnail') 
     
     const user = await myDataBase.getRepository(User).findOne({
-      where: { userId: req.params.id },
+      where: { id: req.params.id },
     });
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { author: { id: user.id }, postId: req.params.postId },
@@ -251,7 +254,7 @@ export class PostController {
   };
 
   static deletePost = async (req: JwtRequest, res: Response) => {
-    const { id: userId } = req.decoded;
+    const { id: id } = req.decoded;
 
     const currentPost = await myDataBase.getRepository(Post).findOne({
       where: { postId: req.params.postId },
@@ -282,7 +285,7 @@ export class PostController {
     if (!currentPost) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
-    if (userId !== currentPost.author.id) {
+    if (id !== currentPost.author.id) {
       return res.status(401).json({ message: '게시글 작성자 본인이 아닙니다.' });
     }
     const results = await myDataBase.getRepository(Post).delete(currentPost.postId);

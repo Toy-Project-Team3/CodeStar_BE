@@ -7,11 +7,11 @@ import { Comment } from '../entity/Comment';
 
 export class CommentController {
   static createComment = async (req: JwtRequest, res: Response) => {
-    const { userId: id  } = req.decoded;
+    const {  id: id } = req.decoded;
     const { content } = req.body;
 
     const post = await myDataBase.getRepository(Post).findOne({
-      where: { title :req.params.title},
+      where: { postId :req.params.postId},
       select:{
         postId: true,
         title: true,
@@ -57,7 +57,7 @@ export class CommentController {
   };
 
   static getComments = async (req: JwtRequest, res: Response) => {
-    const {id }= req.decoded 
+    const {id: id }= req.decoded 
     const user = await myDataBase.getRepository(User).findOne({
       where: { id: req.params.id },
     
@@ -91,11 +91,11 @@ export class CommentController {
   };
 
   static updateComment = async(req: JwtRequest, res: Response) => {
-    const {id: userId} = req.decoded
+    const {id: id} = req.decoded
     const { content, commentId } = req.body
     
     const post = await myDataBase.getRepository(Post).findOne({
-      where: { title :req.params.title},
+      where: { postId:req.params.postId},
       select:{
         postId: true,
         title: true,
@@ -116,7 +116,7 @@ export class CommentController {
     if (!post) {
       return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
     }
-    if (!userId) {
+    if (!id) {
       return res.status(401).json({ message: '댓글 작성자 본인이 아닙니다.' });
     }
 
@@ -138,7 +138,7 @@ export class CommentController {
   }
 
   static deleteComment = async(req: JwtRequest, res: Response) => {
-    const {id: userId} = req.decoded
+    const {id: id} = req.decoded
     const currentComment = await myDataBase.getRepository(Comment).findOne({
       where:{commentId: req.params.commentId},
       select:{
@@ -157,7 +157,7 @@ export class CommentController {
     }
   try{
     const results = await myDataBase.getRepository(Comment).delete(currentComment.commentId)
-    if(userId === currentComment.author.id){
+    if(id === currentComment.author.id){
 
       return res.status(204).json({message: '댓글 삭제가 완료되었습니다.'})
     }
