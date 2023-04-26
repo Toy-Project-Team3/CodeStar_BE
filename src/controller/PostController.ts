@@ -151,6 +151,8 @@ export class PostController {
       where: { author: { id: user.id }, postId: req.params.postId },
       select: {
         postId: true,
+        title: true,
+        content: true,
         likes:true,
         dislikes: true,
         isPrivate:true,
