@@ -47,6 +47,7 @@ export class PostController {
         content: true,
         isPrivate: true,
         likes: true,
+        thumbnail:true,
         author: {
           id: true,
           userId: true,
@@ -100,6 +101,7 @@ export class PostController {
         content: true,
         createdAt: true,
         isPrivate: true,
+        thumbnail: true,
         author: {
           userId: true,
           userName: true,
@@ -149,6 +151,7 @@ export class PostController {
         likes:true,
         dislikes: true,
         isPrivate:true,
+        thumbnail: true,
         author: {
           id: true,
           userId: true,
