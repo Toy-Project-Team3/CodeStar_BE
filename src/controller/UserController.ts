@@ -174,7 +174,7 @@ export class UserController {
       },
     });
     if (!user.id && user.userId) {
-      return res.status(401).json({ message: '접근 권한이 없습니다.' });
+      return res.status(401).json({ message: '접근 권한이 없습니다..' });
     }
 
     const newUser = new User();
