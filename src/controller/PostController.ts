@@ -40,7 +40,7 @@ export class PostController {
   static getPosts = async (req: Request, res: Response) => {
     
     const results = await myDataBase.getRepository(Post).find({
-      
+      where:{isPrivate: false},
       select: {
         postId: true,
         title: true,
@@ -68,7 +68,8 @@ export class PostController {
     }
   };
 
-  static getAuthorPosts = async (req: Request, res: Response) => {
+  static getAuthorPosts = async (req: JwtRequest, res: Response) => {
+    const {id } = req.decoded
     const user = await myDataBase.getRepository(User).findOne({
       where: { id: req.params.id },
       select: {
@@ -92,7 +93,7 @@ export class PostController {
     });
 
     const results = await myDataBase.getRepository(Post).find({
-      where: { author: { id: user.id } },
+      where: { author: { id: user.id }, isPrivate: false },
       select: {
         postId: true,
         title: true,
@@ -117,12 +118,16 @@ export class PostController {
         commentList: true,
       },
     });
-    if(!results) {
+
+    const filteredResults = results.filter(post => {
+      return !post.isPrivate || post.author.id === id;
+    });
+    if(!filteredResults) {
       res.status(404).json({ message: '게시글들을 찾을 수 없습니다.' });
     }
-    console.log(results);
+  
     try {
-      res.status(200).send(results);
+      res.status(200).send(filteredResults);
     } catch (err) {
       res.status(500).json({ message: '블로그 조회 중 오류가 발생하였습니다.' });
     }
