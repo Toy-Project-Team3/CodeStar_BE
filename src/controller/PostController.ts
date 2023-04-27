@@ -82,6 +82,8 @@ export class PostController {
         postList: true,
         profileImg: true,
         bio: true,
+        createdAt:true,
+        updatedAt: true,
         commentList: true,
         credits: {
           creditScoreId: true,
