@@ -30,11 +30,10 @@ export class PostController {
     const post = new Post();
     post.title = title;
     post.content = content;
-    post.isPrivate = Boolean(isPrivate);
+    post.isPrivate = (isPrivate === 'true');
     post.author = user;
     thumbnail && (post.thumbnail = thumbnail.location)
     
-    console.log(Boolean(isPrivate))
     const result = await myDataBase.getRepository(Post).insert(post);
 
     res.status(201).json({ message: '게시글이 작성완료되었습니다.' });
