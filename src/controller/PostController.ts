@@ -50,6 +50,8 @@ export class PostController {
         isPrivate: true,
         likes: true,
         thumbnail:true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           id: true,
           userId: true,
@@ -103,10 +105,11 @@ export class PostController {
         postId: true,
         title: true,
         content: true,
-        createdAt: true,
         likes: true,
         isPrivate: true,
         thumbnail: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           id: true,
           userId: true,
